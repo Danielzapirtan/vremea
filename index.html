@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bucharest · live time & temperature</title>
+  <!-- Free weather API: Open-Meteo (no key required) -->
+  <!-- Free time API: worldtimeapi.org (no key required, used once to sync) -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      padding: 1.5rem;
+      margin: 0;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2.8rem;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      text-align: center;
+      max-width: 550px;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+    .city-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.4rem 1.6rem;
+      border-radius: 3rem;
+      color: #cbd5e1;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      font-size: 0.9rem;
+      margin-bottom: 1.8rem;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .time-display {
+      font-size: clamp(3.2rem, 12vw, 5.5rem);
+      font-weight: 650;
+      color: #f8fafc;
+      line-height: 1.1;
+      letter-spacing: 1px;
+      text-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      margin-bottom: 0.3rem;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+    }
+    .seconds-indicator {
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: #94a3b8;
+      margin-left: 0.2rem;
+      vertical-align: middle;
+      letter-spacing: 0;
+    }
+    .date-string {
+      font-size: 1.1rem;
+      color: #9ca3af;
+      margin-bottom: 2.2rem;
+      font-weight: 450;
+      letter-spacing: 0.3px;
+      background: rgba(0,0,0,0.2);
+      display: inline-block;
+      padding: 0.4rem 1.5rem;
+      border-radius: 2rem;
+      backdrop-filter: blur(5px);
+    }
+    .temp-section {
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 2rem;
+      padding: 1.5rem 1.2rem;
+      margin-top: 1rem;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: center;
+      gap: 1.2rem;
+    }
+    .temp-main {
+      font-size: 3.8rem;
+      font-weight: 600;
+      color: #facc15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+      line-height: 1;
+    }
+    .temp-unit {
+      font-size: 2rem;
+      color: #eab308;
+      font-weight: 500;
+      margin-left: 0.2rem;
+    }
+    .weather-desc {
+      font-size: 1.3rem;
+      color: #e2e8f0;
+      text-transform: capitalize;
+      font-weight: 450;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1.8rem;
+      margin-top: 0.8rem;
+      color: #b9c2d0;
+      font-size: 0.95rem;
+    }
+    .update-note {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 1.4rem;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 12px #22c55e;
+    }
+    .loading-temp {
+      opacity: 0.7;
+      font-style: italic;
+    }
+    @media (max-width: 480px) {
+      .card {
+        padding: 2rem 1.5rem;
+      }
+      .temp-main {
+        font-size: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="city-badge">
+      <span>📍 Bucharest, RO</span>
+    </div>
+
+    <!-- Time display: HH:MM + smaller seconds -->
+    <div id="timeContainer" class="time-display">
+      <span id="hoursMinutes">--:--</span>
+      <span id="secondsDisplay" class="seconds-indicator">:--</span>
+    </div>
+
+    <div id="dateDisplay" class="date-string">---, -- --- ----</div>
+
+    <!-- Temperature block -->
+    <div class="temp-section" id="tempBlock">
+      <div class="temp-main" id="tempValue">
+        <span>🌡️</span> <span id="tempDegrees">--</span><span class="temp-unit">°C</span>
+      </div>
+      <div class="weather-desc" id="weatherDesc">
+        <span id="weatherIcon"></span> <span id="weatherText">loading…</span>
+      </div>
+    </div>
+    <div class="meta-row" id="extraMeta">
+      <span id="windInfo">💨 -- km/h</span>
+      <span id="humidityInfo">💧 --%</span>
+    </div>
+    <div class="update-note">
+      <span class="dot" id="statusDot"></span>
+      <span id="updateLabel">time updates every 200ms · temperature every 2 min</span>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ---------- CONFIGURATION ----------
+      // Fixed city: Bucharest (latitude/longitude)
+      const LAT = 44.4;
+      const LON = 26.1;
+      const TIMEZONE = 'Europe/Bucharest'; // used for display formatting
+
+      // Update intervals
+      const TIME_UPDATE_MS = 200;        // 200 milliseconds
+      const TEMP_UPDATE_MS = 2 * 60 * 1000; // 2 minutes
+
+      // ---------- DOM ELEMENTS ----------
+      const hoursMinutesEl = document.getElementById('hoursMinutes');
+      const secondsEl = document.getElementById('secondsDisplay');
+      const dateEl = document.getElementById('dateDisplay');
+      const tempDegreesEl = document.getElementById('tempDegrees');
+      const weatherTextEl = document.getElementById('weatherText');
+      const weatherIconEl = document.getElementById('weatherIcon');
+      const windInfoEl = document.getElementById('windInfo');
+      const humidityInfoEl = document.getElementById('humidityInfo');
+      const statusDot = document.getElementById('statusDot');
+      const updateLabel = document.getElementById('updateLabel');
+
+      // ---------- STATE ----------
+      let currentDate = null;            // store latest Date object based on Bucharest offset
+      let timeIntervalId = null;
+      let tempIntervalId = null;
+      let tempFetchInProgress = false;
+
+      // ---------- HELPER: format date parts based on Buchrarest time ----------
+      function formatBucharestDate(date) {
+        if (!date || isNaN(date.getTime())) {
+          return { hours: '--', minutes: '--', seconds: '--', dateStr: '---' };
+        }
+        try {
+          // Use Intl.DateTimeFormat for fixed Bucharest timezone
+          const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+            timeZone: TIMEZONE,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          });
+          const dateFormatter = new Intl.DateTimeFormat('en-GB', {
+            timeZone: TIMEZONE,
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          });
+
+          const timeParts = timeFormatter.formatToParts(date);
+          const dateStr = dateFormatter.format(date);
+
+          let hours = '00', minutes = '00', seconds = '00';
+          for (let part of timeParts) {
+            if (part.type === 'hour') hours = part.value;
+            if (part.type === 'minute') minutes = part.value;
+            if (part.type === 'second') seconds = part.value;
+          }
+          return { hours, minutes, seconds, dateStr };
+        } catch (e) {
+          // fallback using UTC-based approximation (less accurate but safe)
+          const utc = date;
+          const offsetMs = 0; // we cannot compute DST easily; using Intl is best.
+          // In rare case Intl fails, display raw UTC.
+          const h = String(utc.getUTCHours()).padStart(2, '0');
+          const m = String(utc.getUTCMinutes()).padStart(2, '0');
+          const s = String(utc.getUTCSeconds()).padStart(2, '0');
+          return { hours: h, minutes: m, seconds: s, dateStr: utc.toDateString() };
+        }
+      }
+
+      // ---------- UPDATE TIME DISPLAY (called every 200ms) ----------
+      function updateTimeDisplay() {
+        // Use system clock but adjust to Bucharest timezone via Intl.
+        // This does not require network after initial sync; real-time accurate.
+        const now = new Date();
+        currentDate = now;
+        const { hours, minutes, seconds, dateStr } = formatBucharestDate(now);
+
+        // Update DOM
+        hoursMinutesEl.textContent = `${hours}:${minutes}`;
+        // seconds shown separately with colon prefix for style
+        secondsEl.textContent = `:${seconds}`;
+        dateEl.textContent = dateStr;
+      }
+
+      // ---------- FETCH WEATHER FROM OPEN-METEO (no API key) ----------
+      async function fetchTemperature() {
+        if (tempFetchInProgress) return;
+        tempFetchInProgress = true;
+
+        // Update UI to show loading state (subtle)
+        weatherTextEl.textContent = 'updating…';
+        statusDot.style.background = '#fbbf24'; // yellow while fetching
+        statusDot.style.boxShadow = '0 0 10px #fbbf24';
+
+        try {
+          // Open-Meteo API: current weather for coordinates.
+          // Parameters: temperature_2m, relative_humidity_2m, wind_speed_10m, weather_code
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=${encodeURIComponent(TIMEZONE)}&forecast_days=1`;
+
+          const response = await fetch(url, { method: 'GET', cache: 'no-store' });
+          if (!response.ok) throw new Error(`API status ${response.status}`);
+
+          const data = await response.json();
+          if (!data || !data.current) {
+            throw new Error('Invalid weather data');
+          }
+
+          const current = data.current;
+          const temperature = current.temperature_2m;
+          const humidity = current.relative_humidity_2m;
+          const windSpeed = current.wind_speed_10m;
+          const weatherCode = current.weather_code;
+
+          // Update temperature
+          if (temperature !== null && temperature !== undefined) {
+            tempDegreesEl.textContent = Math.round(temperature);
+          } else {
+            tempDegreesEl.textContent = '--';
+          }
+
+          // Weather description based on WMO code (simple mapping)
+          const weatherInfo = getWeatherDescription(weatherCode);
+          weatherTextEl.textContent = weatherInfo.text;
+          weatherIconEl.textContent = weatherInfo.icon;
+
+          // Wind & humidity
+          if (windSpeed !== null && windSpeed !== undefined) {
+            windInfoEl.innerHTML = `💨 ${Math.round(windSpeed)} km/h`;
+          } else {
+            windInfoEl.innerHTML = `💨 -- km/h`;
+          }
+          if (humidity !== null && humidity !== undefined) {
+            humidityInfoEl.innerHTML = `💧 ${Math.round(humidity)}%`;
+          } else {
+            humidityInfoEl.innerHTML = `💧 --%`;
+          }
+
+          // Update status dot to green (success)
+          statusDot.style.background = '#22c55e';
+          statusDot.style.boxShadow = '0 0 12px #22c55e';
+          updateLabel.textContent = 'time 200ms · temp updated just now';
+
+        } catch (error) {
+          console.error('Temperature fetch error:', error);
+          // Keep previous values if available, show error indicator
+          weatherTextEl.textContent = 'error loading';
+          weatherIconEl.textContent = '⚠️';
+          statusDot.style.background = '#ef4444';
+          statusDot.style.boxShadow = '0 0 10px #ef4444';
+          updateLabel.textContent = 'time 200ms · temp fetch failed';
+          // Do not clear existing temperature numbers
+        } finally {
+          tempFetchInProgress = false;
+        }
+      }
+
+      // WMO weather code interpretation (simplified)
+      function getWeatherDescription(code) {
+        const codeMap = {
+          0: { icon: '☀️', text: 'Clear sky' },
+          1: { icon: '🌤️', text: 'Mainly clear' },
+          2: { icon: '⛅', text: 'Partly cloudy' },
+          3: { icon: '☁️', text: 'Overcast' },
+          45: { icon: '🌫️', text: 'Fog' },
+          48: { icon: '🌫️', text: 'Depositing rime fog' },
+          51: { icon: '🌦️', text: 'Light drizzle' },
+          53: { icon: '🌦️', text: 'Moderate drizzle' },
+          55: { icon: '🌧️', text: 'Dense drizzle' },
+          56: { icon: '🌧️', text: 'Freezing drizzle' },
+          57: { icon: '🌧️', text: 'Freezing drizzle' },
+          61: { icon: '🌧️', text: 'Slight rain' },
+          63: { icon: '🌧️', text: 'Moderate rain' },
+          65: { icon: '🌧️', text: 'Heavy rain' },
+          66: { icon: '🌧️', text: 'Freezing rain' },
+          67: { icon: '🌧️', text: 'Freezing rain' },
+          71: { icon: '❄️', text: 'Slight snow' },
+          73: { icon: '❄️', text: 'Moderate snow' },
+          75: { icon: '❄️', text: 'Heavy snow' },
+          77: { icon: '❄️', text: 'Snow grains' },
+          80: { icon: '🌦️', text: 'Rain showers' },
+          81: { icon: '🌦️', text: 'Moderate showers' },
+          82: { icon: '🌧️', text: 'Violent showers' },
+          85: { icon: '🌨️', text: 'Snow showers' },
+          86: { icon: '🌨️', text: 'Heavy snow showers' },
+          95: { icon: '⛈️', text: 'Thunderstorm' },
+          96: { icon: '⛈️', text: 'Thunderstorm with hail' },
+          99: { icon: '⛈️', text: 'Thunderstorm with hail' }
+        };
+        if (code !== undefined && codeMap[code]) {
+          return codeMap[code];
+        }
+        return { icon: '🌡️', text: 'Unknown' };
+      }
+
+      // ---------- INITIAL SETUP ----------
+      function initializeApp() {
+        // Immediately set time display to avoid blank state
+        updateTimeDisplay();
+
+        // Start time interval (200ms)
+        if (timeIntervalId) clearInterval(timeIntervalId);
+        timeIntervalId = setInterval(updateTimeDisplay, TIME_UPDATE_MS);
+
+        // Fetch temperature immediately, then set interval for 2 minutes
+        fetchTemperature();
+        if (tempIntervalId) clearInterval(tempIntervalId);
+        tempIntervalId = setInterval(fetchTemperature, TEMP_UPDATE_MS);
+
+        // Set initial status
+        statusDot.style.background = '#22c55e';
+        statusDot.style.boxShadow = '0 0 12px #22c55e';
+        updateLabel.textContent = 'time 200ms · temp every 2 min';
+      }
+
+      // Cleanup function for page unload (good practice)
+      function cleanup() {
+        if (timeIntervalId) clearInterval(timeIntervalId);
+        if (tempIntervalId) clearInterval(tempIntervalId);
+      }
+
+      window.addEventListener('beforeunload', cleanup);
+      window.addEventListener('load', initializeApp);
+
+      // Optional: handle visibility change to reduce updates when tab hidden (but keep intervals)
+      // We keep intervals running; browser throttles inactive tabs naturally.
+    })();
+  </script>
+</body>
+</html>
