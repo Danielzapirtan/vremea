@@ -231,14 +231,14 @@
         }
         try {
           // Use Intl.DateTimeFormat for fixed Bucharest timezone
-          const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+          const timeFormatter = new Intl.DateTimeFormat('ro-RO', {
             timeZone: TIMEZONE,
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
             hour12: false
           });
-          const dateFormatter = new Intl.DateTimeFormat('en-GB', {
+          const dateFormatter = new Intl.DateTimeFormat('ro-RO', {
             timeZone: TIMEZONE,
             weekday: 'short',
             day: 'numeric',
