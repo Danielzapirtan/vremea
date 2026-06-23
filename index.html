@@ -308,8 +308,10 @@
 
           const current = data.current;
           const hourly_temp = data.hourly.temperature_2m;
-          //const temperature = JSON.stringify({ current.temperature_2m, hourly_temp });
-          const temperature = hourly_temp[0];
+          const hourly_time = data.hourly_time;
+          let temperature = hourly_temp[0];
+          if (hourly_time[0] == "2026-06-23T0000")
+              temperature = current.temperature_2m;
           const humidity = current.relative_humidity_2m;
           const windSpeed = current.wind_speed_10m;
           const weatherCode = current.weather_code;
