@@ -93,7 +93,7 @@
       gap: 1.2rem;
     }
     .temp-main {
-      font-size: 3.8rem;
+      font-size: 0.9rem;
       font-weight: 600;
       color: #facc15;
       display: flex;
@@ -300,7 +300,7 @@
         try {
           // Open-Meteo API: current weather for coordinates.
           // Parameters: temperature_2m, relative_humidity_2m, wind_speed_10m, weather_code
-          const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=${encodeURIComponent(TIMEZONE)}&forecast_days=1`;
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&minutely_15=temperature_2m&forecast_minutely_15=4&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=${encodeURIComponent(TIMEZONE)}&forecast_days=1`;
 
           const response = await fetch(url, { method: 'GET', cache: 'no-store' });
           if (!response.ok) throw new Error(`API status ${response.status}`);
@@ -311,11 +311,10 @@
           }
 
           const current = data.current;
-          const hourly_temp = data.hourly.temperature_2m;
-          const hourly_time = data.hourly.time;
-          const hour = (new Date().getHours() + 1) % 24;
-          document.getElementById("hour").textContent = `${hour}:00 `;
-          const temperature = hourly_temp[hour];
+          const hourly_temp = data.minutely_15.temperature_2m;
+          const hourly_time = data.minutely_15.time;
+          document.getElementById("hour").textContent = `${hourly_time[0].slice(11)}`;
+          const temperature = hourly_temp[0];
           const humidity = current.relative_humidity_2m;
           const windSpeed = current.wind_speed_10m;
           const weatherCode = current.weather_code;
