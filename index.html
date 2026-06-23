@@ -296,7 +296,7 @@
         try {
           // Open-Meteo API: current weather for coordinates.
           // Parameters: temperature_2m, relative_humidity_2m, wind_speed_10m, weather_code
-          const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=${encodeURIComponent(TIMEZONE)}&forecast_days=1`;
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=${encodeURIComponent(TIMEZONE)}&forecast_days=1`;
 
           const response = await fetch(url, { method: 'GET', cache: 'no-store' });
           if (!response.ok) throw new Error(`API status ${response.status}`);
