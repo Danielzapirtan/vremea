@@ -176,7 +176,7 @@
     <!-- Temperature block -->
     <div class="temp-section" id="tempBlock">
       <div class="temp-main" id="tempValue">
-        <span>🌡️</span> <span id="tempDegrees">--</span><span class="temp-unit">°C</span>
+        <span>🌡️</span><span id="hour">00:00 </span> <span id="tempDegrees">--</span><span class="temp-unit">°C</span>
       </div>
       <div class="weather-desc" id="weatherDesc">
         <span id="weatherIcon"></span> <span id="weatherText">loading…</span>
@@ -309,7 +309,8 @@
           const current = data.current;
           const hourly_temp = data.hourly.temperature_2m;
           const hourly_time = data.hourly.time;
-          const hour = new Date().getHours() + 1;
+          const hour = (new Date().getHours() + 1) % 24;
+          document.getElementById("hour").textContent = `${hour}:00 `;
           const temperature = hourly_temp[hour];
           const humidity = current.relative_humidity_2m;
           const windSpeed = current.wind_speed_10m;
