@@ -1,437 +1,767 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Bucharest · live time & temperature</title>
-  <!-- Free weather API: Open-Meteo (no key required) -->
-  <!-- Free time API: worldtimeapi.org (no key required, used once to sync) -->
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      padding: 1.5rem;
-      margin: 0;
-    }
-    .card {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 2.5rem;
-      padding: 2.5rem 2.8rem;
-      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
-      text-align: center;
-      max-width: 550px;
-      width: 100%;
-      transition: all 0.2s ease;
-    }
-    .city-badge {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.12);
-      padding: 0.4rem 1.6rem;
-      border-radius: 3rem;
-      color: #cbd5e1;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      font-size: 0.9rem;
-      margin-bottom: 1.8rem;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .time-display {
-      font-size: clamp(3.2rem, 12vw, 5.5rem);
-      font-weight: 650;
-      color: #f8fafc;
-      line-height: 1.1;
-      letter-spacing: 1px;
-      text-shadow: 0 8px 20px rgba(0,0,0,0.6);
-      margin-bottom: 0.3rem;
-      font-feature-settings: "tnum";
-      font-variant-numeric: tabular-nums;
-    }
-    .seconds-indicator {
-      font-size: 1.8rem;
-      font-weight: 400;
-      color: #94a3b8;
-      margin-left: 0.2rem;
-      vertical-align: middle;
-      letter-spacing: 0;
-    }
-    .date-string {
-      font-size: 1.1rem;
-      color: #9ca3af;
-      margin-bottom: 2.2rem;
-      font-weight: 450;
-      letter-spacing: 0.3px;
-      background: rgba(0,0,0,0.2);
-      display: inline-block;
-      padding: 0.4rem 1.5rem;
-      border-radius: 2rem;
-      backdrop-filter: blur(5px);
-    }
-    .temp-section {
-      background: rgba(255, 255, 255, 0.07);
-      border-radius: 2rem;
-      padding: 1.5rem 1.2rem;
-      margin-top: 1rem;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: center;
-      gap: 1.2rem;
-    }
-    .temp-main {
-      font-size: 2.0rem;
-      font-weight: 600;
-      color: #facc15;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.2rem;
-      line-height: 1;
-    }
-    .temp-unit {
-      font-size: 1.4rem;
-      color: #eab308;
-      font-weight: 500;
-      margin-left: 0.2rem;
-    }
-    #hour {
-      color: red;
-      font-size: 0.6rem;
-    }
-    .weather-desc {
-      font-size: 1.3rem;
-      color: #e2e8f0;
-      text-transform: capitalize;
-      font-weight: 450;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 1.8rem;
-      margin-top: 0.8rem;
-      color: #b9c2d0;
-      font-size: 0.95rem;
-    }
-    .update-note {
-      font-size: 0.75rem;
-      color: #6b7280;
-      margin-top: 1.4rem;
-      letter-spacing: 0.4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-    }
-    .dot {
-      width: 8px;
-      height: 8px;
-      background: #22c55e;
-      border-radius: 50%;
-      display: inline-block;
-      box-shadow: 0 0 12px #22c55e;
-    }
-    .loading-temp {
-      opacity: 0.7;
-      font-style: italic;
-    }
-    @media (max-width: 480px) {
-      .card {
-        padding: 2rem 1.5rem;
-      }
-      .temp-main {
-        font-size: 3rem;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Vreme</title>
+<style>
+  :root {
+    --bg: #0f1923;
+    --card: #1a2733;
+    --card2: #1f3040;
+    --accent: #4fc3f7;
+    --accent2: #81d4fa;
+    --text: #e8f4fd;
+    --muted: #7a9bb5;
+    --hot: #ff7043;
+    --cold: #42a5f5;
+    --border: #2a3f52;
+    --tab-active: #4fc3f7;
+    --tab-inactive: #2a3f52;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  header {
+    padding: 12px 16px 8px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .clock {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .location-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .coords {
+    font-size: 0.7rem;
+    color: var(--muted);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .btn {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .btn:active { background: var(--border); }
+  .btn-refresh {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    font-weight: 700;
+    padding: 5px 12px;
+  }
+  .btn-refresh:active { opacity: 0.8; }
+
+  .tabs {
+    display: flex;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 73px;
+    z-index: 99;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px 4px;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tab.active {
+    color: var(--tab-active);
+    border-bottom-color: var(--tab-active);
+  }
+
+  .panel { display: none; padding: 16px; }
+  .panel.active { display: block; }
+
+  /* Current weather */
+  .temp-main {
+    text-align: center;
+    padding: 20px 10px 10px;
+  }
+  .temp-value {
+    font-size: 5.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -3px;
+    color: var(--text);
+  }
+  .temp-feels {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .weather-desc {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--accent2);
+    margin-top: 6px;
+  }
+  .weather-icon {
+    font-size: 3rem;
+    margin-bottom: 4px;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .metric-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .metric-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .metric-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .metric-sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Hourly */
+  .hourly-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hour-row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 70px 36px 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+  }
+  .hour-time {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .hour-icon { font-size: 1.4rem; text-align: center; }
+  .hour-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hour-temp {
+    font-size: 1.25rem;
+    font-weight: 800;
+    text-align: right;
+    min-width: 50px;
+  }
+  .hour-rain {
+    font-size: 0.7rem;
+    color: var(--cold);
+    text-align: right;
+    min-width: 36px;
+  }
+  .now-row { border-color: var(--accent); }
+
+  /* Daily */
+  .daily-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .day-row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 90px 36px 1fr auto;
+    align-items: center;
+    gap: 10px;
+  }
+  .day-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .day-icon { font-size: 1.4rem; text-align: center; }
+  .day-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .day-temps {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .day-high {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--hot);
+    display: inline;
+  }
+  .day-sep { font-size: 0.85rem; color: var(--muted); margin: 0 3px; }
+  .day-low {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--cold);
+    display: inline;
+  }
+
+  /* Settings */
+  .settings-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .settings-title {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  input[type="number"], input[type="text"] {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  .label-small {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .field-group { flex: 1; }
+  .btn-full {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 4px;
+    text-align: center;
+  }
+  .status-msg {
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-top: 8px;
+    min-height: 18px;
+    text-align: center;
+  }
+  .error-msg { color: #ef9a9a; }
+
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    color: var(--muted);
+    gap: 12px;
+    font-size: 0.9rem;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .wind-dir { font-size: 1rem; }
+
+  @media (min-width: 400px) {
+    .temp-value { font-size: 6.5rem; }
+  }
+</style>
 </head>
 <body>
-  <div class="card">
-    <div class="city-badge">
-      <span>📍 Bucharest, RO</span>
-    </div>
 
-    <!-- Time display: HH:MM + smaller seconds -->
-    <div id="timeContainer" class="time-display">
-      <span id="hoursMinutes">--:--</span>
-      <span id="secondsDisplay" class="seconds-indicator">:--</span>
-    </div>
+<header>
+  <div class="header-top">
+    <div class="clock" id="clock">--:--:--</div>
+    <button class="btn btn-refresh" onclick="refreshWeather()">⟳ Actualizare</button>
+  </div>
+  <div class="location-row">
+    <div class="coords" id="coordsDisplay">Nicio locație salvată</div>
+    <button class="btn" onclick="switchTab('settings')">⚙</button>
+  </div>
+</header>
 
-    <div id="dateDisplay" class="date-string">---, -- --- ----</div>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('current')" id="tab-current">Acum</div>
+  <div class="tab" onclick="switchTab('hourly')" id="tab-hourly">Ore</div>
+  <div class="tab" onclick="switchTab('daily')" id="tab-daily">Zile</div>
+  <div class="tab" onclick="switchTab('settings')" id="tab-settings">Locație</div>
+</div>
 
-    <!-- Temperature block -->
-    <div class="temp-section" id="tempBlock">
-      <div class="temp-main" id="tempValue">
-        <span>🌡️</span><span id="hour">00:00 </span> <span id="tempDegrees">--</span><span class="temp-unit">°C</span>
+<div class="panel active" id="panel-current">
+  <div class="loading" id="loading-current">
+    <div class="spinner"></div>
+    <span>Se încarcă datele...</span>
+  </div>
+  <div id="current-content" style="display:none"></div>
+</div>
+
+<div class="panel" id="panel-hourly">
+  <div class="loading" id="loading-hourly">
+    <div class="spinner"></div>
+  </div>
+  <div class="hourly-list" id="hourly-content" style="display:none"></div>
+</div>
+
+<div class="panel" id="panel-daily">
+  <div class="loading" id="loading-daily">
+    <div class="spinner"></div>
+  </div>
+  <div class="daily-list" id="daily-content" style="display:none"></div>
+</div>
+
+<div class="panel" id="panel-settings">
+  <div class="settings-card">
+    <div class="settings-title">Locație GPS</div>
+    <div class="input-row">
+      <div class="field-group">
+        <div class="label-small">Latitudine</div>
+        <input type="number" id="inputLat" placeholder="45.7489" step="0.0001">
       </div>
-      <div class="weather-desc" id="weatherDesc">
-        <span id="weatherIcon"></span> <span id="weatherText">loading…</span>
+      <div class="field-group">
+        <div class="label-small">Longitudine</div>
+        <input type="number" id="inputLon" placeholder="21.2087" step="0.0001">
       </div>
     </div>
-    <div class="meta-row" id="extraMeta">
-      <span id="windInfo">💨 -- km/h</span>
-      <span id="humidityInfo">💧 --%</span>
-    </div>
-    <div class="update-note">
-      <span class="dot" id="statusDot"></span>
-      <span id="updateLabel">time updates every 200ms · temperature every 2 min</span>
+    <button class="btn btn-full" onclick="saveLocation()">💾 Salvează locația</button>
+    <button class="btn btn-full" style="margin-top:8px;" onclick="detectLocation()">📍 Detectează automat</button>
+    <div class="status-msg" id="settingsStatus"></div>
+  </div>
+  <div class="settings-card">
+    <div class="settings-title">Informații</div>
+    <div style="font-size:0.78rem;color:var(--muted);line-height:1.6;">
+      Date furnizate de <strong style="color:var(--accent)">Open-Meteo</strong> (API gratuit, fără cheie).<br>
+      Locația este salvată local în browser.<br>
+      Actualizarea se face la reîncărcarea paginii sau manual.
     </div>
   </div>
+</div>
 
-  <script>
-    (function() {
-      'use strict';
+<script>
+const WMO = {
+  0:  ['☀️','Cer senin'],
+  1:  ['🌤️','Predominant senin'],
+  2:  ['⛅','Parțial noros'],
+  3:  ['☁️','Înnorat'],
+  45: ['🌫️','Ceață'],
+  48: ['🌫️','Ceață cu chiciură'],
+  51: ['🌦️','Burnițe ușoare'],
+  53: ['🌦️','Burnițe moderate'],
+  55: ['🌧️','Burnițe intense'],
+  61: ['🌧️','Ploaie ușoară'],
+  63: ['🌧️','Ploaie moderată'],
+  65: ['🌧️','Ploaie puternică'],
+  71: ['🌨️','Ninsoare ușoară'],
+  73: ['🌨️','Ninsoare moderată'],
+  75: ['❄️','Ninsoare abundentă'],
+  77: ['🌨️','Fulgi de gheață'],
+  80: ['🌦️','Averse ușoare'],
+  81: ['🌧️','Averse moderate'],
+  82: ['⛈️','Averse puternice'],
+  85: ['🌨️','Averse de ninsoare'],
+  86: ['❄️','Averse abundente de ninsoare'],
+  95: ['⛈️','Furtună'],
+  96: ['⛈️','Furtună cu grindină'],
+  99: ['⛈️','Furtună puternică cu grindină'],
+};
 
-      // ---------- CONFIGURATION ----------
-      // Fixed city: Bucharest (latitude/longitude)
-      const LAT = 44.467664;
-      const LON = 26.152823;
-      const TIMEZONE = 'Europe/Bucharest'; // used for display formatting
+function wmo(code) {
+  return WMO[code] || ['🌡️', 'Necunoscut'];
+}
 
-      // Update intervals
-      const TIME_UPDATE_MS = 200;        // 200 milliseconds
-      const TEMP_UPDATE_MS = 5 * 60 * 1000; // 2 minutes
+function windDirName(deg) {
+  const dirs = ['N','NE','E','SE','S','SV','V','NV'];
+  return dirs[Math.round(deg / 45) % 8];
+}
 
-      // ---------- DOM ELEMENTS ----------
-      const hoursMinutesEl = document.getElementById('hoursMinutes');
-      const secondsEl = document.getElementById('secondsDisplay');
-      const dateEl = document.getElementById('dateDisplay');
-      const tempDegreesEl = document.getElementById('tempDegrees');
-      const weatherTextEl = document.getElementById('weatherText');
-      const weatherIconEl = document.getElementById('weatherIcon');
-      const windInfoEl = document.getElementById('windInfo');
-      const humidityInfoEl = document.getElementById('humidityInfo');
-      const statusDot = document.getElementById('statusDot');
-      const updateLabel = document.getElementById('updateLabel');
+function beaufort(kmh) {
+  if (kmh < 1) return '0 Bf';
+  if (kmh < 6) return '1 Bf';
+  if (kmh < 12) return '2 Bf';
+  if (kmh < 20) return '3 Bf';
+  if (kmh < 29) return '4 Bf';
+  if (kmh < 39) return '5 Bf';
+  if (kmh < 50) return '6 Bf';
+  if (kmh < 62) return '7 Bf';
+  if (kmh < 75) return '8 Bf';
+  if (kmh < 89) return '9 Bf';
+  if (kmh < 103) return '10 Bf';
+  if (kmh < 118) return '11 Bf';
+  return '12 Bf';
+}
 
-      // ---------- STATE ----------
-      let currentDate = null;            // store latest Date object based on Bucharest offset
-      let timeIntervalId = null;
-      let tempIntervalId = null;
-      let tempFetchInProgress = false;
+function tempColor(t) {
+  if (t >= 35) return '#ff3d00';
+  if (t >= 28) return '#ff7043';
+  if (t >= 20) return '#ffa726';
+  if (t >= 10) return '#e8f4fd';
+  if (t >= 0)  return '#81d4fa';
+  return '#42a5f5';
+}
 
-      // ---------- HELPER: format date parts based on Buchrarest time ----------
-      function formatBucharestDate(date) {
-        if (!date || isNaN(date.getTime())) {
-          return { hours: '--', minutes: '--', seconds: '--', dateStr: '---' };
-        }
-        try {
-          // Use Intl.DateTimeFormat for fixed Bucharest timezone
-          const timeFormatter = new Intl.DateTimeFormat('ro-RO', {
-            timeZone: TIMEZONE,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-          });
-          const dateFormatter = new Intl.DateTimeFormat('ro-RO', {
-            timeZone: TIMEZONE,
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-          });
+let weatherData = null;
 
-          const timeParts = timeFormatter.formatToParts(date);
-          const dateStr = dateFormatter.format(date);
+function loadLocation() {
+  const lat = localStorage.getItem('wx_lat');
+  const lon = localStorage.getItem('wx_lon');
+  if (lat && lon) return { lat: parseFloat(lat), lon: parseFloat(lon) };
+  return null;
+}
 
-          let hours = '00', minutes = '00', seconds = '00';
-          for (let part of timeParts) {
-            if (part.type === 'hour') hours = part.value;
-            if (part.type === 'minute') minutes = part.value;
-            if (part.type === 'second') seconds = part.value;
-          }
-          return { hours, minutes, seconds, dateStr };
-        } catch (e) {
-          // fallback using UTC-based approximation (less accurate but safe)
-          const utc = date;
-          const offsetMs = 0; // we cannot compute DST easily; using Intl is best.
-          // In rare case Intl fails, display raw UTC.
-          const h = String(utc.getUTCHours()).padStart(2, '0');
-          const m = String(utc.getUTCMinutes()).padStart(2, '0');
-          const s = String(utc.getUTCSeconds()).padStart(2, '0');
-          return { hours: h, minutes: m, seconds: s, dateStr: utc.toDateString() };
-        }
-      }
+function saveLocation() {
+  const lat = parseFloat(document.getElementById('inputLat').value);
+  const lon = parseFloat(document.getElementById('inputLon').value);
+  const st = document.getElementById('settingsStatus');
+  if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+    st.textContent = 'Coordonate invalide.';
+    st.className = 'status-msg error-msg';
+    return;
+  }
+  localStorage.setItem('wx_lat', lat.toFixed(6));
+  localStorage.setItem('wx_lon', lon.toFixed(6));
+  st.textContent = 'Locație salvată! Se actualizează...';
+  st.className = 'status-msg';
+  updateCoordsDisplay(lat, lon);
+  fetchWeather(lat, lon);
+  setTimeout(() => switchTab('current'), 600);
+}
 
-      // ---------- UPDATE TIME DISPLAY (called every 200ms) ----------
-      function updateTimeDisplay() {
-        // Use system clock but adjust to Bucharest timezone via Intl.
-        // This does not require network after initial sync; real-time accurate.
-        const now = new Date();
-        currentDate = now;
-        const { hours, minutes, seconds, dateStr } = formatBucharestDate(now);
+function detectLocation() {
+  const st = document.getElementById('settingsStatus');
+  if (!navigator.geolocation) {
+    st.textContent = 'Geolocation indisponibil.';
+    st.className = 'status-msg error-msg';
+    return;
+  }
+  st.textContent = 'Se detectează...';
+  st.className = 'status-msg';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    document.getElementById('inputLat').value = lat.toFixed(6);
+    document.getElementById('inputLon').value = lon.toFixed(6);
+    localStorage.setItem('wx_lat', lat.toFixed(6));
+    localStorage.setItem('wx_lon', lon.toFixed(6));
+    st.textContent = 'Locație detectată și salvată!';
+    st.className = 'status-msg';
+    updateCoordsDisplay(lat, lon);
+    fetchWeather(lat, lon);
+    setTimeout(() => switchTab('current'), 800);
+  }, err => {
+    st.textContent = 'Eroare: ' + err.message;
+    st.className = 'status-msg error-msg';
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
 
-        // Update DOM
-        hoursMinutesEl.textContent = `${hours}:${minutes}`;
-        // seconds shown separately with colon prefix for style
-        secondsEl.textContent = `:${seconds}`;
-        dateEl.textContent = dateStr;
-      }
+function updateCoordsDisplay(lat, lon) {
+  const ns = lat >= 0 ? 'N' : 'S';
+  const ew = lon >= 0 ? 'E' : 'V';
+  document.getElementById('coordsDisplay').textContent =
+    `${Math.abs(lat).toFixed(5)}°${ns}  ${Math.abs(lon).toFixed(5)}°${ew}`;
+}
 
-      // ---------- FETCH WEATHER FROM OPEN-METEO (no API key) ----------
-      async function fetchTemperature() {
-        if (tempFetchInProgress) return;
-        tempFetchInProgress = true;
+function refreshWeather() {
+  const loc = loadLocation();
+  if (!loc) { switchTab('settings'); return; }
+  fetchWeather(loc.lat, loc.lon);
+}
 
-        // Update UI to show loading state (subtle)
-        weatherTextEl.textContent = 'updating…';
-        statusDot.style.background = '#fbbf24'; // yellow while fetching
-        statusDot.style.boxShadow = '0 0 10px #fbbf24';
+async function fetchWeather(lat, lon) {
+  showLoading(true);
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?` +
+      `latitude=${lat}&longitude=${lon}` +
+      `&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cloud_cover,visibility` +
+      `&hourly=temperature_2m,weather_code,precipitation_probability,precipitation` +
+      `&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,precipitation_probability_max` +
+      `&wind_speed_unit=kmh&precipitation_unit=mm` +
+      `&timezone=auto&forecast_days=5`;
 
-        try {
-          // Open-Meteo API: current weather for coordinates.
-          // Parameters: temperature_2m, relative_humidity_2m, wind_speed_10m, weather_code
-          const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&minutely_15=temperature_2m&forecast_minutely_15=4&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=${encodeURIComponent(TIMEZONE)}&forecast_days=1`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('Eroare API: ' + resp.status);
+    weatherData = await resp.json();
+    renderAll(weatherData);
+  } catch(e) {
+    showError(e.message);
+  }
+}
 
-          const response = await fetch(url, { method: 'GET', cache: 'no-store' });
-          if (!response.ok) throw new Error(`API status ${response.status}`);
+function showLoading(on) {
+  ['current','hourly','daily'].forEach(p => {
+    document.getElementById('loading-' + p).style.display = on ? 'flex' : 'none';
+    const c = document.getElementById(p === 'current' ? 'current-content' : p + '-content');
+    if (c) c.style.display = on ? 'none' : (p === 'current' ? 'block' : 'flex');
+  });
+  if (on) {
+    document.getElementById('hourly-content').style.display = 'none';
+    document.getElementById('daily-content').style.display = 'none';
+  }
+}
 
-          const data = await response.json();
-          if (!data || !data.current) {
-            throw new Error('Invalid weather data');
-          }
+function showError(msg) {
+  showLoading(false);
+  document.getElementById('current-content').innerHTML =
+    `<div class="loading" style="color:#ef9a9a">⚠️ ${msg}<br><small style="margin-top:8px;color:var(--muted)">Verificați conexiunea și coordonatele.</small></div>`;
+  document.getElementById('current-content').style.display = 'block';
+}
 
-          const current = data.current;
-          const hourly_temp = data.minutely_15.temperature_2m;
-          const hourly_time = data.minutely_15.time;
-          document.getElementById("hour").textContent = `${hourly_time[0].slice(11)}`;
-          const temperature = hourly_temp[0];
-          const humidity = current.relative_humidity_2m;
-          const windSpeed = current.wind_speed_10m;
-          const weatherCode = current.weather_code;
+function renderAll(d) {
+  renderCurrent(d);
+  renderHourly(d);
+  renderDaily(d);
+  showLoading(false);
+}
 
-          // Update temperature
-          if (temperature !== null && temperature !== undefined) {
-            tempDegreesEl.textContent = temperature;
-          } else {
-            tempDegreesEl.textContent = '--';
-          }
+function renderCurrent(d) {
+  const c = d.current;
+  const [icon, desc] = wmo(c.weather_code);
+  const t = Math.round(c.temperature_2m);
+  const feels = Math.round(c.apparent_temperature);
+  const color = tempColor(t);
 
-          // Weather description based on WMO code (simple mapping)
-          const weatherInfo = getWeatherDescription(weatherCode);
-          weatherTextEl.textContent = weatherInfo.text;
-          weatherIconEl.textContent = weatherInfo.icon;
+  const pres = c.surface_pressure ? Math.round(c.surface_pressure) + ' hPa' : '—';
+  const vis = c.visibility ? (c.visibility >= 1000 ? (c.visibility/1000).toFixed(1) + ' km' : c.visibility + ' m') : '—';
+  const windDir = windDirName(c.wind_direction_10m);
+  const windSpd = Math.round(c.wind_speed_10m);
+  const gusts = Math.round(c.wind_gusts_10m);
+  const precip = c.precipitation !== undefined ? c.precipitation.toFixed(1) + ' mm' : '—';
 
-          // Wind & humidity
-          if (windSpeed !== null && windSpeed !== undefined) {
-            windInfoEl.innerHTML = `💨 ${Math.round(windSpeed)} km/h`;
-          } else {
-            windInfoEl.innerHTML = `💨 -- km/h`;
-          }
-          if (humidity !== null && humidity !== undefined) {
-            humidityInfoEl.innerHTML = `💧 ${Math.round(humidity)}%`;
-          } else {
-            humidityInfoEl.innerHTML = `💧 --%`;
-          }
+  document.getElementById('current-content').innerHTML = `
+    <div class="temp-main">
+      <div class="weather-icon">${icon}</div>
+      <div class="temp-value" style="color:${color}">${t}°</div>
+      <div class="weather-desc">${desc}</div>
+      <div class="temp-feels">Senzație termică: <strong>${feels}°C</strong></div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">💧 Umiditate</div>
+        <div class="metric-value">${c.relative_humidity_2m}%</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">💨 Vânt</div>
+        <div class="metric-value">${windSpd} km/h</div>
+        <div class="metric-sub">${windDir} · Rafale: ${gusts} km/h · ${beaufort(windSpd)}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">🌡️ Presiune</div>
+        <div class="metric-value">${pres}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">☁️ Acoperire nori</div>
+        <div class="metric-value">${c.cloud_cover}%</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">👁️ Vizibilitate</div>
+        <div class="metric-value">${vis}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">🌧️ Precipitații</div>
+        <div class="metric-value">${precip}</div>
+      </div>
+    </div>
+  `;
+}
 
-          // Update status dot to green (success)
-          statusDot.style.background = '#22c55e';
-          statusDot.style.boxShadow = '0 0 12px #22c55e';
-          updateLabel.textContent = 'time 200ms · temp updated just now';
+function renderHourly(d) {
+  const h = d.hourly;
+  const times = h.time;
+  const now = new Date();
 
-        } catch (error) {
-          console.error('Temperature fetch error:', error);
-          // Keep previous values if available, show error indicator
-          weatherTextEl.textContent = 'error loading';
-          weatherIconEl.textContent = '⚠️';
-          statusDot.style.background = '#ef4444';
-          statusDot.style.boxShadow = '0 0 10px #ef4444';
-          updateLabel.textContent = 'time 200ms · temp fetch failed';
-          // Do not clear existing temperature numbers
-        } finally {
-          tempFetchInProgress = false;
-        }
-      }
+  // Last multiple of 15 min
+  const last15 = new Date(now);
+  last15.setSeconds(0, 0);
+  last15.setMinutes(Math.floor(last15.getMinutes() / 15) * 15);
 
-      // WMO weather code interpretation (simplified)
-      function getWeatherDescription(code) {
-        const codeMap = {
-          0: { icon: '☀️', text: 'Clear sky' },
-          1: { icon: '🌤️', text: 'Mainly clear' },
-          2: { icon: '⛅', text: 'Partly cloudy' },
-          3: { icon: '☁️', text: 'Overcast' },
-          45: { icon: '🌫️', text: 'Fog' },
-          48: { icon: '🌫️', text: 'Depositing rime fog' },
-          51: { icon: '🌦️', text: 'Light drizzle' },
-          53: { icon: '🌦️', text: 'Moderate drizzle' },
-          55: { icon: '🌧️', text: 'Dense drizzle' },
-          56: { icon: '🌧️', text: 'Freezing drizzle' },
-          57: { icon: '🌧️', text: 'Freezing drizzle' },
-          61: { icon: '🌧️', text: 'Slight rain' },
-          63: { icon: '🌧️', text: 'Moderate rain' },
-          65: { icon: '🌧️', text: 'Heavy rain' },
-          66: { icon: '🌧️', text: 'Freezing rain' },
-          67: { icon: '🌧️', text: 'Freezing rain' },
-          71: { icon: '❄️', text: 'Slight snow' },
-          73: { icon: '❄️', text: 'Moderate snow' },
-          75: { icon: '❄️', text: 'Heavy snow' },
-          77: { icon: '❄️', text: 'Snow grains' },
-          80: { icon: '🌦️', text: 'Rain showers' },
-          81: { icon: '🌦️', text: 'Moderate showers' },
-          82: { icon: '🌧️', text: 'Violent showers' },
-          85: { icon: '🌨️', text: 'Snow showers' },
-          86: { icon: '🌨️', text: 'Heavy snow showers' },
-          95: { icon: '⛈️', text: 'Thunderstorm' },
-          96: { icon: '⛈️', text: 'Thunderstorm with hail' },
-          99: { icon: '⛈️', text: 'Thunderstorm with hail' }
-        };
-        if (code !== undefined && codeMap[code]) {
-          return codeMap[code];
-        }
-        return { icon: '🌡️', text: 'Unknown' };
-      }
+  // Find closest hourly index to last15 (API gives hourly)
+  // Show: last multiple of 15 (approx = nearest past hour), then next 4 hours
+  let startIdx = -1;
+  for (let i = 0; i < times.length; i++) {
+    const t = new Date(times[i]);
+    if (t <= last15) startIdx = i;
+    else break;
+  }
+  if (startIdx < 0) startIdx = 0;
 
-      // ---------- INITIAL SETUP ----------
-      function initializeApp() {
-        // Immediately set time display to avoid blank state
-        updateTimeDisplay();
+  // Indices: startIdx (= last15 approx), then +1, +2, +3, +4
+  const indices = [];
+  for (let j = 0; j <= 4; j++) {
+    const idx = startIdx + j;
+    if (idx < times.length) indices.push(idx);
+  }
 
-        // Start time interval (200ms)
-        if (timeIntervalId) clearInterval(timeIntervalId);
-        timeIntervalId = setInterval(updateTimeDisplay, TIME_UPDATE_MS);
+  let html = '';
+  indices.forEach((idx, j) => {
+    const t = new Date(times[idx]);
+    const label = j === 0
+      ? `${pad(last15.getHours())}:${pad(last15.getMinutes())}`
+      : `${pad(t.getHours())}:00`;
+    const isNow = j === 0;
+    const temp = Math.round(h.temperature_2m[idx]);
+    const [icon, desc] = wmo(h.weather_code[idx]);
+    const prob = h.precipitation_probability[idx];
+    const precip = h.precipitation[idx];
+    const color = tempColor(temp);
+    const rainStr = prob > 0 ? `${prob}%` : '';
+    html += `
+      <div class="hour-row${isNow ? ' now-row' : ''}">
+        <div class="hour-time">${isNow ? '▶ ' : ''}${label}</div>
+        <div class="hour-icon">${icon}</div>
+        <div class="hour-desc">${desc}</div>
+        <div class="hour-temp" style="color:${color}">${temp}°</div>
+        <div class="hour-rain">${rainStr ? '💧' + rainStr : ''}</div>
+      </div>
+    `;
+  });
 
-        // Fetch temperature immediately, then set interval for 2 minutes
-        fetchTemperature();
-        if (tempIntervalId) clearInterval(tempIntervalId);
-        tempIntervalId = setInterval(fetchTemperature, TEMP_UPDATE_MS);
+  document.getElementById('hourly-content').innerHTML = html;
+  document.getElementById('hourly-content').style.flexDirection = 'column';
+}
 
-        // Set initial status
-        statusDot.style.background = '#22c55e';
-        statusDot.style.boxShadow = '0 0 12px #22c55e';
-        updateLabel.textContent = 'time 200ms · temp every 2 min';
-      }
+function renderDaily(d) {
+  const dd = d.daily;
+  const dayNames = ['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
+  const monthNames = ['ian','feb','mar','apr','mai','iun','iul','aug','sep','oct','nov','dec'];
 
-      // Cleanup function for page unload (good practice)
-      function cleanup() {
-        if (timeIntervalId) clearInterval(timeIntervalId);
-        if (tempIntervalId) clearInterval(tempIntervalId);
-      }
+  // Show today + next 4 days = 5 days max
+  const count = Math.min(5, dd.time.length);
+  let html = '';
+  for (let i = 0; i < count; i++) {
+    const date = new Date(dd.time[i] + 'T12:00:00');
+    const isToday = i === 0;
+    const dayLabel = isToday
+      ? 'Azi'
+      : `${dayNames[date.getDay()]} ${date.getDate()} ${monthNames[date.getMonth()]}`;
+    const high = Math.round(dd.temperature_2m_max[i]);
+    const low = Math.round(dd.temperature_2m_min[i]);
+    const [icon, desc] = wmo(dd.weather_code[i]);
+    html += `
+      <div class="day-row">
+        <div class="day-name">${dayLabel}</div>
+        <div class="day-icon">${icon}</div>
+        <div class="day-desc">${desc}</div>
+        <div class="day-temps">
+          <span class="day-high">${high}°</span>
+          <span class="day-sep">/</span>
+          <span class="day-low">${low}°</span>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('daily-content').innerHTML = html;
+}
 
-      window.addEventListener('beforeunload', cleanup);
-      window.addEventListener('load', initializeApp);
+function pad(n) { return String(n).padStart(2, '0'); }
 
-      // Optional: handle visibility change to reduce updates when tab hidden (but keep intervals)
-      // We keep intervals running; browser throttles inactive tabs naturally.
-    })();
-  </script>
+function switchTab(name) {
+  ['current','hourly','daily','settings'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === name);
+    document.getElementById('panel-' + t).classList.toggle('active', t === name);
+  });
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
+
+// Init
+setInterval(updateClock, 1000);
+updateClock();
+
+const loc = loadLocation();
+if (loc) {
+  updateCoordsDisplay(loc.lat, loc.lon);
+  document.getElementById('inputLat').value = loc.lat;
+  document.getElementById('inputLon').value = loc.lon;
+  fetchWeather(loc.lat, loc.lon);
+} else {
+  showLoading(false);
+  document.getElementById('current-content').innerHTML =
+    `<div class="loading" style="flex-direction:column;gap:14px">
+      <div style="font-size:2rem">📍</div>
+      <div style="color:var(--muted);text-align:center">Setați locația în tab-ul <strong style="color:var(--accent)">Locație</strong><br>pentru a vedea vremea.</div>
+      <button class="btn" onclick="switchTab('settings')" style="font-size:0.9rem;padding:10px 20px">Setează locația</button>
+    </div>`;
+  document.getElementById('current-content').style.display = 'block';
+  switchTab('settings');
+}
+</script>
 </body>
 </html>
