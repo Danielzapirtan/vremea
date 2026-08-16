@@ -590,8 +590,8 @@ function renderAll(d) {
 function renderCurrent(d) {
   const c = d.current;
   const [icon, desc] = wmo(c.weather_code);
-  const t = Math.round(c.temperature_2m);
-  const feels = Math.round(c.apparent_temperature);
+  const t = c.temperature_2m;
+  const feels = c.apparent_temperature;
   const color = tempColor(t);
 
   const pres = c.surface_pressure ? Math.round(c.surface_pressure) + ' hPa' : '—';
@@ -672,7 +672,7 @@ function renderHourly(d) {
       ? `${pad(last15.getHours())}:${pad(last15.getMinutes())}`
       : `${pad(t.getHours())}:00`;
     const isNow = j === 0;
-    const temp = Math.round(h.temperature_2m[idx]);
+    const temp = h.temperature_2m[idx];
     const [icon, desc] = wmo(h.weather_code[idx]);
     const prob = h.precipitation_probability[idx];
     const precip = h.precipitation[idx];
@@ -707,8 +707,8 @@ function renderDaily(d) {
     const dayLabel = isToday
       ? 'Azi'
       : `${dayNames[date.getDay()]} ${date.getDate()} ${monthNames[date.getMonth()]}`;
-    const high = Math.round(dd.temperature_2m_max[i]);
-    const low = Math.round(dd.temperature_2m_min[i]);
+    const high = dd.temperature_2m_max[i];
+    const low = dd.temperature_2m_min[i];
     const [icon, desc] = wmo(dd.weather_code[i]);
     html += `
       <div class="day-row">
